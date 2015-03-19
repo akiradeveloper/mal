@@ -3,8 +3,9 @@
 # Regex.scan(r, "123") |> IO.inspect
 # Regex.scan(r, "(+ 1 2)") |> IO.inspect
 
-defmodule MAL do
+defmodule MAL.Reader do
   def tokenizer(s) do
+    # IO.puts s
     r = ~r/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
     l = for [x, _] <- Regex.scan(r, s), do: x
     # sz = Enum.map(l, fn x -> 1 end) |> Enum.sum # FIXME
@@ -68,8 +69,8 @@ end
 # MAL.parse_form(["1", ")"]) |> IO.inspect
 # MAL.parse_form(["*", "1", "2", ")"]) |> IO.inspect
 
-MAL.read_str("()") |> IO.inspect
-MAL.read_str("(1)") |> IO.inspect
-MAL.read_str("(* 1 2)") |> IO.inspect
-MAL.read_str("(* (* 1 2) 3)") |> IO.inspect
-MAL.read_str("(f 1 2)") |> IO.inspect
+MAL.Reader.read_str("()") |> IO.inspect
+MAL.Reader.read_str("(1)") |> IO.inspect
+MAL.Reader.read_str("(* 1 2)") |> IO.inspect
+MAL.Reader.read_str("(* (* 1 2) 3)") |> IO.inspect
+MAL.Reader.read_str("(f 1 2)") |> IO.inspect
