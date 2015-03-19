@@ -11,3 +11,6 @@ stats-lisp: $(SOURCES_LISP)
 build:
 	elixirc reader.ex
 	elixirc printer.ex
+
+run: build
+	elixir step2_eval.ex
