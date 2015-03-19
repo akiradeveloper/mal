@@ -8,7 +8,6 @@ defmodule MAL.Main do
   def rep(line) do
     a = read line
     b = eval(a, "")
-    IO.inspect b
     c = print b
     c
   end

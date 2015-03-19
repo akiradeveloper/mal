@@ -5,10 +5,8 @@
 
 defmodule MAL.Reader do
   def tokenizer(s) do
-    # IO.puts s
     r = ~r/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
     l = for [x, _] <- Regex.scan(r, s), do: x
-    # sz = Enum.map(l, fn x -> 1 end) |> Enum.sum # FIXME
     List.delete_at(l, Enum.count(l) - 1) |> Enum.map (&(String.strip(&1)))
   end
 
@@ -22,35 +20,32 @@ defmodule MAL.Reader do
   end
 
   def parse_form(toks) do
-    # IO.inspect toks
     case toks do
       ["(" | _] -> parse_list(toks)
       [_ | _] -> parse_atom(toks)
     end
   end
 
-  # ((1) 2) -> {{:list, [{:list, [{:int, 1}]}, {:int, 2}]}, []]}
+  # :: {ast, rest}
   def parse_list(toks) do
     [_ | tl] = toks
-    {a, b} = do_parse_list([], tl)
-    {{:mal_list, Enum.reverse(a)}, b}
+    {ast, rest} = do_parse_list([], tl)
+    {{:mal_list, Enum.reverse(ast)}, rest}
   end
 
   # :: {[ast], rest}
   def do_parse_list(acc, toks) do
     case toks do
       [")" | rest] -> {acc, rest}
-      x -> 1
+      [_ | _] ->
         {ast, rest} = parse_form(toks)
-        # IO.inspect ast
         do_parse_list([ast | acc], rest)
     end
   end
 
-  # 1 2) -> {{:int, 1}, ["2", ")"]}
+  # :: {ast, rest}
   def parse_atom(toks) do
-    [hd | rest] = toks
-    tok = hd # FIXME trim
+    [tok | rest] = toks
     ast = cond do 
       Integer.parse(tok) != :error ->
         {:mal_number, elem(Integer.parse(tok), 0)}
