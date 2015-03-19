@@ -8,7 +8,7 @@ defmodule MAL do
     r = ~r/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
     l = for [x, _] <- Regex.scan(r, s), do: x
     # sz = Enum.map(l, fn x -> 1 end) |> Enum.sum # FIXME
-    List.delete_at(l, Enum.count(l) - 1)
+    List.delete_at(l, Enum.count(l) - 1) |> Enum.map (&(String.strip(&1)))
   end
 
   def read_str(s) do
@@ -21,25 +21,27 @@ defmodule MAL do
   end
 
   def parse_form(toks) do
+    # IO.inspect toks
     case toks do
       ["(" | _] -> parse_list(toks)
-      [tok | _] -> parse_atom(toks)
+      [_ | _] -> parse_atom(toks)
     end
   end
 
   # ((1) 2) -> {{:list, [{:list, [{:int, 1}]}, {:int, 2}]}, []]}
   def parse_list(toks) do
     [_ | tl] = toks
-    {:mal_list, elem(do_parse_list([], tl), 0)}
+    {a, b} = do_parse_list([], tl)
+    {{:mal_list, Enum.reverse(a)}, b}
   end
 
-  # :: {[ast], toks}
+  # :: {[ast], rest}
   def do_parse_list(acc, toks) do
     case toks do
-      [")" | rest] -> 
-        {acc, rest}
-      true ->
+      [")" | rest] -> {acc, rest}
+      x -> 1
         {ast, rest} = parse_form(toks)
+        # IO.inspect ast
         do_parse_list([ast | acc], rest)
     end
   end
@@ -58,10 +60,16 @@ defmodule MAL do
   end
 end
 
-MAL.tokenizer("(+ 123 456)") |> IO.inspect
-MAL.tokenizer("(+ 2 (* 3 4))") |> IO.inspect
+# MAL.tokenizer("(+ 123 456)") |> IO.inspect
+# MAL.tokenizer("(+ 2 (* 3 4))") |> IO.inspect
 
-MAL.parse_form(["(", ")"]) |> IO.inspect
-MAL.parse_form(["(", "1", ")"]) |> IO.inspect
-MAL.parse_form(["1", ")"]) |> IO.inspect
-MAL.parse_form(["*", "1", "2", ")"]) |> IO.inspect
+# MAL.parse_form(["(", ")"]) |> IO.inspect
+# MAL.parse_form(["(", "1", ")"]) |> IO.inspect
+# MAL.parse_form(["1", ")"]) |> IO.inspect
+# MAL.parse_form(["*", "1", "2", ")"]) |> IO.inspect
+
+MAL.read_str("()") |> IO.inspect
+MAL.read_str("(1)") |> IO.inspect
+MAL.read_str("(* 1 2)") |> IO.inspect
+MAL.read_str("(* (* 1 2) 3)") |> IO.inspect
+MAL.read_str("(f 1 2)") |> IO.inspect
