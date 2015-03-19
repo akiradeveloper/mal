@@ -13,7 +13,8 @@ defmodule MAL.Main do
   end
   def repl_loop do
     line = IO.gets "user> "
-    (rep line) |> IO.write
+    # requires newline
+    (rep line) |> IO.puts
     repl_loop
   end
 end
