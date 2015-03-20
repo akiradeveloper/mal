@@ -2,19 +2,16 @@ import MAL.Reader
 import MAL.Printer
 
 defmodule MAL.Main do
-  def int_binop(f) do
-    fn args -> 
-      [{:mal_number, x} | [{:mal_number, y} | []]] = args
-      {:mal_number, f.(x, y)}
-    end
+  def lift_int_binop(f) do
+    fn {:mal_number, x}, {:mal_number, y} -> {:mal_number, f.(x, y)} end
   end
 
   def repl_env do
     %{
-      "+" => int_binop(fn x, y -> x + y end),
-      "-" => int_binop(fn x, y -> x - y end),
-      "*" => int_binop(fn x, y -> x * y end),
-      "/" => int_binop(fn x, y -> div(x, y) end)
+      "+" => lift_int_binop(fn x, y -> x + y end),
+      "-" => lift_int_binop(fn x, y -> x - y end),
+      "*" => lift_int_binop(fn x, y -> x * y end),
+      "/" => lift_int_binop(fn x, y -> div(x, y) end)
     }
   end
 
@@ -39,7 +36,7 @@ defmodule MAL.Main do
       {:mal_list, xs} ->
         l = eval_ast(ast, env)
         {:mal_list, [f | args]} = l
-        f.(args)
+        apply(f, args)
       _ -> eval_ast(ast, env)
     end
   end
