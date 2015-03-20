@@ -28,8 +28,7 @@ defmodule MAL.Reader do
 
   # :: {ast, rest}
   def parse_list(toks) do
-    [_ | tl] = toks
-    {ast, rest} = do_parse_list([], tl)
+    {ast, rest} = do_parse_list([], tl(toks))
     {{:mal_list, Enum.reverse(ast)}, rest}
   end
 
