@@ -1,7 +1,9 @@
 defmodule MAL.Printer do
   def pr_str(ast) do
     case ast do
-      {:mal_list, val} -> "(" <> Enum.join(Enum.map(val, &(pr_str(&1))), " ") <> ")"
+      {:mal_list, val} ->
+        l = val |> Enum.map(&(pr_str(&1))) |> Enum.join(" ")
+        "(" <> l <> ")"
       {:mal_number, val} -> to_string(val)
       {:mal_symbol, val} -> val
     end

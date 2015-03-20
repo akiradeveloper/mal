@@ -2,15 +2,18 @@ import MAL.Reader
 import MAL.Printer
 
 defmodule MAL.Main do
-  def read(str), do: MAL.Reader.read_str(str)
-  def eval(ast, env), do: ast
-  def print(exp), do: MAL.Printer.pr_str(exp)
-  def rep(line) do
-    a = read line
-    b = eval(a, "")
-    c = print b
-    c
-  end
+  def read(str),
+  do: MAL.Reader.read_str(str)
+
+  def eval(ast, env),
+  do: ast
+
+  def print(exp),
+  do: MAL.Printer.pr_str(exp)
+
+  def rep(line),
+  do: (read line) |> eval("") |> print
+
   def repl_loop do
     line = IO.gets "user> "
     # requires newline

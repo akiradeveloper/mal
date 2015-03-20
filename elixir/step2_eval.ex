@@ -2,9 +2,8 @@ import MAL.Reader
 import MAL.Printer
 
 defmodule MAL.Main do
-  def lift_int_binop(f) do
-    fn {:mal_number, x}, {:mal_number, y} -> {:mal_number, f.(x, y)} end
-  end
+  def lift_int_binop(f),
+  do: fn {:mal_number, x}, {:mal_number, y} -> {:mal_number, f.(x, y)} end
 
   def repl_env do
     %{
@@ -15,7 +14,8 @@ defmodule MAL.Main do
     }
   end
 
-  def read(str), do: MAL.Reader.read_str(str)
+  def read(str),
+  do: MAL.Reader.read_str(str)
 
   def eval_ast(ast, env) do
     case ast do
@@ -41,14 +41,12 @@ defmodule MAL.Main do
     end
   end
 
-  def print(exp), do: MAL.Printer.pr_str(exp)
-  def rep(line) do
-    a = read line
-    b = eval(a, repl_env)
-    IO.inspect b
-    c = print b
-    c
-  end
+  def print(exp),
+  do: MAL.Printer.pr_str(exp)
+
+  def rep(line),
+  do: (read line) |> eval(repl_env) |> print
+
   def repl_loop do
     line = IO.gets "user> "
     # requires newline
