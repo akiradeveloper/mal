@@ -12,7 +12,7 @@ defmodule MAL.Env do
     if e do
       env
     else
-      env.outer.find[k]
+      find(env.outer, k)
     end
   end
 
@@ -45,10 +45,13 @@ defmodule MAL.Env do
   do: Agent.get(pid, fn env -> do_get(env, k) end)
 end
 
-# e = MAL.Env.do_new(nil)
-# e = MAL.Env.do_set(e, "a", 1)
-# MAL.Env.do_get(e, "a") |> IO.inspect
+e1 = MAL.Env.new(nil)
+IO.inspect e1
+MAL.Env.set(e1, "a", 1)
+MAL.Env.get(e1, "a") |> IO.inspect
 
-pid = MAL.Env.new(nil)
-MAL.Env.set(pid, "a", 1)
-MAL.Env.get(pid, "a") |> IO.inspect
+e2 = MAL.Env.new(e1)
+IO.inspect e2
+MAL.Env.set(e2, "b", 2)
+MAL.Env.get(e2, "b") |> IO.inspect
+MAL.Env.get(e2, "a") |> IO.inspect
