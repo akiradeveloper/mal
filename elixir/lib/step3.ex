@@ -13,11 +13,12 @@ defmodule MAL.Step3 do
       "*" => lift_int_binop(fn x, y -> x * y end),
       "/" => lift_int_binop(fn x, y -> div(x, y) end)
     }
-    Enum.reduce(Dict.to_list(ops), MAL.Env.new(),
-      fn {k, op}, acc ->
-        MAL.Env.set(acc, k, op)
-        acc
+    env = MAL.Env.new()
+    Dict.to_list(ops) |> Enum.each(
+      fn {k, op} ->
+        MAL.Env.set(env, k, op)
       end)
+    env
   end
 
   def read(str),
