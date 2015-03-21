@@ -43,17 +43,14 @@ defmodule MAL.Step3 do
           {:mal_symbol, "def!"} ->
             [_, {:mal_symbol, a}, b | _] = xs
             val = eval(b, env)
-            # IO.puts "def!--"
-            # MAL.Env.show(env) |> IO.inspect
             MAL.Env.set(env, a, val)
-            # MAL.Env.show(env) |> IO.inspect
             val
           {:mal_symbol, "let*"} ->
             let_env = MAL.Env.new(env)
             [_, {:mal_list, lets}, b | _] = xs
             # TODO list
             [{:mal_symbol, k}, v | _] = lets
-            MAL.Env.set(let_env, k, v)
+            MAL.Env.set(let_env, k, eval(v, env))
             eval(b, let_env)
           _ -> 
             l = eval_ast(ast, env)
