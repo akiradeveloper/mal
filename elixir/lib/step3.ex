@@ -48,9 +48,10 @@ defmodule MAL.Step3 do
           {:mal_symbol, "let*"} ->
             let_env = MAL.Env.new(env)
             [_, {:mal_list, lets}, b | _] = xs
-            # TODO list
-            [{:mal_symbol, k}, v | _] = lets
-            MAL.Env.set(let_env, k, eval(v, env))
+            Enum.chunk(lets, 2) |> Enum.each(
+              fn [{:mal_symbol, k}, v] ->
+                MAL.Env.set(let_env, k, eval(v, let_env))
+              end)
             eval(b, let_env)
           _ -> 
             l = eval_ast(ast, env)
