@@ -1,7 +1,7 @@
 import MAL.Reader
 import MAL.Printer
 
-defmodule MAL.Main do
+defmodule MAL.Step1 do
   def read(str),
   do: MAL.Reader.read_str(str)
 
@@ -14,11 +14,10 @@ defmodule MAL.Main do
   def rep(line),
   do: (read line) |> eval("") |> print
 
-  def repl_loop do
+  def main do
     line = IO.gets "user> "
     # requires newline
     (rep line) |> IO.puts
-    repl_loop
+    main
   end
 end
-MAL.Main.repl_loop()

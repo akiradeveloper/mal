@@ -1,4 +1,4 @@
-defmodule MAL.Main do
+defmodule MAL.Step0 do
   def read(str), do: str
   def eval(ast, env), do: ast
   def print(exp), do: exp
@@ -6,10 +6,9 @@ defmodule MAL.Main do
   def rep(line),
   do: (read line) |> eval("") |> print
 
-  def repl_loop do
+  def main do
     line = IO.gets "user> "
     IO.write (rep line)
-    repl_loop
+    main
   end
 end
-MAL.Main.repl_loop()

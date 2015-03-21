@@ -1,17 +1,10 @@
-SRCS = step0_repl.ex step1_read_print.ex
-SOURCES_BASE = read.ex printer.ex
-SOURCES_LISP =
+SRCS = step/step0_repl.exs step/step1_read_print.exs step/step2_eval.exs \
+       step/step3_env.exs
+SOURCES_BASE = lib/reader.ex lib/printer.ex
+SOURCES_LISP = lib/env.ex
 SOURCES = $(SOURCES_BASE) $(SOURCES_LISP)
 
 stats: $(SOURCES)
 	@wc $^
 stats-lisp: $(SOURCES_LISP)
 	@wc $^
-
-build:
-	elixirc reader.ex
-	elixirc printer.ex
-	elixirc env.ex
-
-run: build
-	elixir step3_env.ex

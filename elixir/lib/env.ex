@@ -1,4 +1,5 @@
 defmodule MAL.Env do
+  # string -> ast
   defstruct data: %{}, outer: nil
 
   def do_set(env, k, v) do
@@ -29,7 +30,7 @@ defmodule MAL.Env do
   def do_new(outer),
   do: %MAL.Env{outer: outer}
 
-  def new(outer) do
+  def new(outer \\ nil) do
     {:ok, pid} = Agent.start_link(fn -> do_new(outer) end)
     pid
   end
@@ -45,7 +46,7 @@ defmodule MAL.Env do
   do: Agent.get(pid, fn env -> do_get(env, k) end)
 end
 
-e1 = MAL.Env.new(nil)
+e1 = MAL.Env.new()
 IO.inspect e1
 MAL.Env.set(e1, "a", 1)
 MAL.Env.get(e1, "a") |> IO.inspect

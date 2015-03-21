@@ -77,7 +77,7 @@ ruby_STEP_TO_PROG =    ruby/$($(1)).rb
 rust_STEP_TO_PROG =    rust/target/release/$($(1))
 scala_STEP_TO_PROG =   scala/$($(1)).scala
 vb_STEP_TO_PROG =      vb/$($(1)).exe
-elixir_STEP_TO_PROG =  elixir/$($(1)).ex
+elixir_STEP_TO_PROG =  elixir/step/$($(1)).exs
 
 # Needed some argument munging
 COMMA = ,
@@ -112,7 +112,7 @@ ruby_RUNSTEP =    ruby ../$(2) $(3)
 rust_RUNSTEP =    ../$(2) $(3)
 scala_RUNSTEP =   sbt 'run-main $($(1))$(if $(3), $(3),)'
 vb_RUNSTEP =      mono ../$(2) --raw $(3)
-elixir_RUNSTEP =  elixir ../$(2) $(3)
+elixir_RUNSTEP =  mix run ../$(2) $(3)
 
 # Extra options to pass to runtest.py
 cs_TEST_OPTS =  --mono
