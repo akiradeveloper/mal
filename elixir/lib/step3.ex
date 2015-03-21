@@ -6,7 +6,7 @@ defmodule MAL.Step3 do
   def lift_int_binop(f),
   do: fn {:mal_number, x}, {:mal_number, y} -> {:mal_number, f.(x, y)} end
 
-  def repl_env do
+  def make_init_env do
     ops = %{
       "+" => lift_int_binop(fn x, y -> x + y end),
       "-" => lift_int_binop(fn x, y -> x - y end),
@@ -43,7 +43,10 @@ defmodule MAL.Step3 do
           {:mal_symbol, "def!"} ->
             [_, {:mal_symbol, a}, b | _] = xs
             val = eval(b, env)
+            # IO.puts "def!--"
+            # MAL.Env.show(env) |> IO.inspect
             MAL.Env.set(env, a, val)
+            # MAL.Env.show(env) |> IO.inspect
             val
           {:mal_symbol, "let*"} ->
             let_env = MAL.Env.new(env)
@@ -64,13 +67,14 @@ defmodule MAL.Step3 do
   def print(exp),
   do: MAL.Printer.pr_str(exp)
 
-  def rep(line),
-  do: (read line) |> eval(repl_env) |> print
+  def loop(env) do
+    line = IO.gets "user> "
+    (read line) |> eval(env) |> print |> IO.puts
+    loop(env)
+  end
 
   def main do
-    line = IO.gets "user> "
-    # requires newline
-    (rep line) |> IO.puts
-    main
+    env = make_init_env
+    loop(env)
   end
 end

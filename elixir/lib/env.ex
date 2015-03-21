@@ -38,6 +38,9 @@ defmodule MAL.Env do
   def set(pid, k, v),
   do: Agent.update(pid, fn env -> do_set(env, k, v) end)
 
+  def show(pid),
+  do: Agent.get(pid, fn env -> env end)
+
   # :: Env
   def find(pid, k),
   do: Agent.get(pid, fn env -> do_find(env, k) end)
