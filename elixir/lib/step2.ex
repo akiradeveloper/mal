@@ -21,7 +21,7 @@ defmodule MAL.Step2 do
     case ast do
       {:mal_symbol, name} ->
         case env[name] do
-          nil -> raise ArgumentError, message: "symbol not found"
+          nil -> raise ArgumentError, message: "#{name} not found"
           x -> x
         end
       {:mal_list, xs} ->
@@ -31,7 +31,7 @@ defmodule MAL.Step2 do
   end
 
   def eval(ast, env) do
-    IO.inspect ast
+    # IO.inspect ast
     case ast do
       {:mal_list, xs} ->
         l = eval_ast(ast, env)

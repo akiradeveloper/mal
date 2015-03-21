@@ -13,10 +13,11 @@ defmodule MAL.Step3 do
       "*" => lift_int_binop(fn x, y -> x * y end),
       "/" => lift_int_binop(fn x, y -> div(x, y) end)
     }
-    Enum.reduce(Dict.to_list(ops), MAL.Env.new(), fn {k, op}, acc ->
-      acc.set(k, op)
-      acc
-    end)
+    Enum.reduce(Dict.to_list(ops), MAL.Env.new(),
+      fn {k, op}, acc ->
+        MAL.Env.set(acc, k, op)
+        acc
+      end)
   end
 
   def read(str),
@@ -25,8 +26,8 @@ defmodule MAL.Step3 do
   def eval_ast(ast, env) do
     case ast do
       {:mal_symbol, name} ->
-        case env.get(name) do
-          nil -> raise ArgumentError, message: "symbol #{name} not found in environment"
+        case MAL.Env.get(env, name) do
+          nil -> raise ArgumentError, message: "#{name} not found"
           x -> x
         end
       {:mal_list, xs} ->
@@ -39,16 +40,16 @@ defmodule MAL.Step3 do
     case ast do
       {:mal_list, xs} ->
         case hd(xs) do
-          {:mal_symbol, "def!"}  ->
-            [_ | [{:mal_symbol, a} | [b | _]]] = xs
+          {:mal_symbol, "def!"} ->
+            [_, {:mal_symbol, a}, b | _] = xs
             val = eval(b, env)
             MAL.Env.set(env, a, val)
             val
           {:mal_symbol, "let*"} ->
             let_env = MAL.Env.new(env)
-            [_ | [{:mal_list, lets} | [b | _]]] = xs 
+            [_, {:mal_list, lets}, b | _] = xs
             # TODO list
-            [{:mal_symbol, k} | [v | _]] = lets
+            [{:mal_symbol, k}, v | _] = lets
             MAL.Env.set(let_env, k, v)
             eval(b, let_env)
           _ -> 
