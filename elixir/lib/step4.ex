@@ -1,6 +1,8 @@
 import MAL.Reader
 import MAL.Printer
 import MAL.Env
+import MAL.Core
+import MAL.Types
 
 defmodule MAL.Step4 do
   def make_init_env do
@@ -39,25 +41,25 @@ defmodule MAL.Step4 do
             val
           {:mal_symbol, "let*"} ->
             let_env = MAL.Env.new(env)
-            [_, {:mal_list, lets}, b | _] = xs
-            Enum.chunk(lets, 2) |> Enum.each(
+            [_, lets, b | _] = xs
+            Enum.chunk(to_list(lets), 2) |> Enum.each(
               fn [{:mal_symbol, k}, v] ->
                 MAL.Env.set(let_env, k, eval(v, let_env))
               end)
             eval(b, let_env)
           {:mal_symbol, "fn*"} ->
-            [_, {:mal_list, params}, body | _] = xs
+            [_, params, body | _] = xs
             fn args ->
               new_env = MAL.Env.new(env)
-              Enum.zip(params, args) |> Enum.each(
+              Enum.zip(to_list(params), args) |> Enum.each(
                 fn {{:mal_symbol, name}, expr} ->
                   MAL.Env.set(new_env, name, expr)
                 end)
               eval(body, new_env)
-            end
+            end |> wrap_func
           _ -> 
             l = eval_ast(ast, env)
-            {:mal_list, [f | args]} = l
+            {:mal_list, [{:mal_func, f} | args]} = l
             f.(args)
         end
       _ -> eval_ast(ast, env)

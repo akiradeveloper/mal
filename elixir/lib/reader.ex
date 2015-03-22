@@ -21,21 +21,28 @@ defmodule MAL.Reader do
 
   def parse_form(toks) do
     case toks do
-      ["(" | _] -> parse_list(toks)
+      ["(" | _] ->
+        {ast, rest} = do_parse_list([], tl(toks))
+        {{:mal_list, Enum.reverse(ast)}, rest}
+      ["[" | _] -> parse_vector(toks)
+        {ast, rest} = do_parse_list([], tl(toks))
+        {{:mal_vector, Enum.reverse(ast)}, rest}
       [_ | _] -> parse_atom(toks)
     end
   end
 
   # :: {ast, rest}
   def parse_list(toks) do
-    {ast, rest} = do_parse_list([], tl(toks))
-    {{:mal_list, Enum.reverse(ast)}, rest}
+  end
+
+  def parse_vector(toks) do
   end
 
   # :: {[ast], rest}
   def do_parse_list(acc, toks) do
     case toks do
       [")" | rest] -> {acc, rest}
+      ["]" | rest] -> {acc, rest}
       [_ | _] ->
         {ast, rest} = parse_form(toks)
         do_parse_list([ast | acc], rest)
