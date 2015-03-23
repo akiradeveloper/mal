@@ -10,11 +10,11 @@ defmodule MAL.Reader do
     List.delete_at(l, Enum.count(l) - 1) |> Enum.map (&(String.strip(&1)))
   end
 
+  @spec read_str(String.t) :: MAL.Types.t
   def read_str(s) do
     read_form(tokenizer(s))
   end
 
-  # toks :: list of string
   def read_form(toks) do
     elem(parse_form(toks), 0)
   end
@@ -38,7 +38,7 @@ defmodule MAL.Reader do
   def parse_vector(toks) do
   end
 
-  # :: {[ast], rest}
+  @spec do_parse_list([MAL.Types.t], [String.t]) :: {[MAL.Types.t], [String.t]}
   def do_parse_list(acc, toks) do
     case toks do
       [")" | rest] -> {acc, rest}
@@ -49,7 +49,7 @@ defmodule MAL.Reader do
     end
   end
 
-  # :: {ast, rest}
+  @spec parse_atom([String.t]) :: {MAL.Types.t, [String.t]}
   def parse_atom(toks) do
     [tok | rest] = toks
     ast = cond do 
