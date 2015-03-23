@@ -31,6 +31,15 @@ defmodule MAL.Step4 do
     end
   end
 
+  @spec eval_true?(MAL.Types.t, MAL.Env.t) :: boolean
+  def eval_true?(ast, env) do
+    case eval(ast, env) do
+      {:mal_bool, false} -> false
+      {:mal_nil} -> false
+      _ -> true
+    end
+  end
+
   @spec eval(MAL.Types.t, MAL.Env.t) :: MAL.Types.t
   def eval(ast, env) do
     case ast do
@@ -51,9 +60,10 @@ defmodule MAL.Step4 do
             eval(b, let_env)
           {:mal_symbol, "if"} -> 
             [_, pred, t_proc, f_proc] = xs
-            case eval(pred, env) do
-              {:mal_bool, true} -> eval(t_proc, env)
-              {:mal_bool, false} -> eval(f_proc, env)
+            if eval_true?(pred, env) do
+              eval(t_proc, env)
+            else
+              eval(f_proc, env)
             end
           {:mal_symbol, "fn*"} ->
             [_, params, body | _] = xs
