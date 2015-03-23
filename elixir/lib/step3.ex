@@ -4,7 +4,7 @@ import MAL.Env
 
 defmodule MAL.Step3 do
   def lift_int_binop(f),
-  do: fn {:mal_number, x}, {:mal_number, y} -> {:mal_number, f.(x, y)} end
+  do: fn {:mal_int, x}, {:mal_int, y} -> {:mal_int, f.(x, y)} end
 
   def make_init_env do
     ops = %{

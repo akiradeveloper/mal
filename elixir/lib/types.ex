@@ -1,4 +1,27 @@
 defmodule MAL.Types do
+
+  @type t ::
+      mal_int
+    | mal_kw
+    | mal_nil
+    | mal_bool
+    | mal_list
+    | mal_vector
+    | mal_string
+    | mal_symbol
+    | mal_func
+
+    
+  @type mal_nil :: :mal_nil   
+  @type mal_int :: {:mal_int, integer}
+  @type mal_symbol :: {:mal_symbol, String.t}
+  @type mal_string :: {:mal_string, String.t}
+  @type mal_kw :: {:mal_kw, String.t}
+  @type mal_bool :: {:mal_bool, boolean}
+  @type mal_list :: {:mal_list, [t]}
+  @type mal_vector :: {:mal_vector, [t]}
+  @type mal_func :: {:mal_func, fun}
+ 
   def wrap_func(f),
   do: {:mal_func, f}
 

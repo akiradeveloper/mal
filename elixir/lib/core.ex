@@ -16,8 +16,8 @@ defmodule MAL.Core do
   end
 
   def lift_int_op2(f) do
-    fn [{:mal_number, x}, {:mal_number, y} | []] ->
-      {:mal_number, f.(x, y)}
+    fn [{:mal_int, x}, {:mal_int, y} | []] ->
+      {:mal_int, f.(x, y)}
     end
   end
 

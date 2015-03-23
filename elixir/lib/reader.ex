@@ -53,10 +53,17 @@ defmodule MAL.Reader do
   def parse_atom(toks) do
     [tok | rest] = toks
     ast = cond do 
-      Integer.parse(tok) != :error ->
-        {:mal_number, elem(Integer.parse(tok), 0)}
-      true ->
-        {:mal_symbol, tok}
+      Integer.parse(tok) != :error -> {:mal_int, elem(Integer.parse(tok), 0)}
+      true -> case tok do
+        "nil" -> :mal_nil
+        "true" -> {:mal_bool, true}
+        "false" -> {:mal_bool, false}
+        _ -> case hd(to_char_list(tok)) do
+          58 -> {:mal_kw, to_char_list(tok) |> tl |> to_string} # : = 58
+          34 -> {:mal_string, tok |> String.strip(?\")} # " = 34
+          _ -> {:mal_symbol, tok}
+        end
+      end
     end
     {ast, rest}
   end
@@ -70,6 +77,9 @@ end
 # MAL.parse_form(["1", ")"]) |> IO.inspect
 # MAL.parse_form(["*", "1", "2", ")"]) |> IO.inspect
 
+MAL.Reader.read_str("nil") |> IO.inspect
+MAL.Reader.read_str(":hoge") |> IO.inspect
+MAL.Reader.read_str("\"akiradeveloper\"") |> IO.inspect
 MAL.Reader.read_str("()") |> IO.inspect
 MAL.Reader.read_str("(1)") |> IO.inspect
 MAL.Reader.read_str("(* 1 2)") |> IO.inspect
