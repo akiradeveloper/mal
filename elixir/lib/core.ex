@@ -21,6 +21,8 @@ defmodule MAL.Core do
     end
   end
 
+  # TODO should be more specific type
+  @spec ns :: %{}
   def ns do
     %{
       "list" => fn xs -> {:mal_list, xs} end |> wrap_func,

@@ -14,6 +14,7 @@ defmodule MAL.Step4 do
     env
   end
 
+  @spec read(String.t) :: MAL.Types.t
   def read(str),
   do: MAL.Reader.read_str(str)
 
@@ -30,6 +31,7 @@ defmodule MAL.Step4 do
     end
   end
 
+  @spec eval(MAL.Types.t, MAL.Env.t) :: MAL.Types.t
   def eval(ast, env) do
     case ast do
       {:mal_list, xs} ->
@@ -66,6 +68,7 @@ defmodule MAL.Step4 do
     end
   end
 
+  @spec print(MAL.Types.t) :: String.t
   def print(exp),
   do: MAL.Printer.pr_str(exp)
 

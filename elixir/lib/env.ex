@@ -2,12 +2,13 @@ defmodule MAL.Env do
   # string -> ast
   defstruct data: %{}, outer: nil
 
+  @type t :: pid
+
   def do_set(env, k, v) do
     newdata = Dict.put(env.data, k, v)
     %{env | data: newdata}
   end
 
-  # :: Env
   def do_find(env, k) do
     e = env.data[k]
     if e do
@@ -17,7 +18,6 @@ defmodule MAL.Env do
     end
   end
 
-  # :: value
   def do_get(env, k) do
     e = do_find(env, k)
     if e do
@@ -35,16 +35,17 @@ defmodule MAL.Env do
     pid
   end
 
+  @spec set(t, String.t, MAL.Types.t) :: any
   def set(pid, k, v),
   do: Agent.update(pid, fn env -> do_set(env, k, v) end)
 
   def show(pid),
   do: Agent.get(pid, fn env -> env end)
 
-  # :: Env
   def find(pid, k),
   do: Agent.get(pid, fn env -> do_find(env, k) end)
 
+  @spec find(t, String.t) :: MAL.Types.t
   def get(pid, k),
   do: Agent.get(pid, fn env -> do_get(env, k) end)
 end

@@ -1,5 +1,5 @@
 defmodule MAL.Printer do
-  # :: string
+  @spec pr_str(MAL.Types.t) :: String.t
   def pr_str(ast) do
     case ast do
       {:mal_func, _} -> "#<function>"
