@@ -55,7 +55,7 @@ defmodule MAL.Reader do
     ast = cond do 
       Integer.parse(tok) != :error -> {:mal_int, elem(Integer.parse(tok), 0)}
       true -> case tok do
-        "nil" -> :mal_nil
+        "nil" -> {:mal_nil}
         "true" -> {:mal_bool, true}
         "false" -> {:mal_bool, false}
         _ -> case hd(to_char_list(tok)) do
@@ -77,6 +77,8 @@ end
 # MAL.parse_form(["1", ")"]) |> IO.inspect
 # MAL.parse_form(["*", "1", "2", ")"]) |> IO.inspect
 
+MAL.Reader.read_str("true") |> IO.inspect
+MAL.Reader.read_str("false") |> IO.inspect
 MAL.Reader.read_str("nil") |> IO.inspect
 MAL.Reader.read_str(":hoge") |> IO.inspect
 MAL.Reader.read_str("\"akiradeveloper\"") |> IO.inspect

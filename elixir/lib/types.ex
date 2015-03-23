@@ -11,7 +11,7 @@ defmodule MAL.Types do
     | mal_symbol
     | mal_func
     
-  @type mal_nil :: :mal_nil   
+  @type mal_nil :: {:mal_nil}
   @type mal_int :: {:mal_int, integer}
   @type mal_symbol :: {:mal_symbol, String.t}
   @type mal_string :: {:mal_string, String.t}

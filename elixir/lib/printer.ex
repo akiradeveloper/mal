@@ -11,6 +11,11 @@ defmodule MAL.Printer do
         "[" <> l <> "]"
       {:mal_int, val} -> to_string(val)
       {:mal_symbol, val} -> val
+      {:mal_kw, val} -> ":#{val}"
+      {:mal_bool, true} -> "true"
+      {:mal_bool, false} -> "false"
+      {:mal_nil} -> "nil"
+      {:mal_string, val} -> "\"#{val}\""
     end
   end
 end
