@@ -21,6 +21,12 @@ defmodule MAL.Core do
     end
   end
 
+  def lift_cmp_op2(f) do
+    fn [{:mal_int, x}, {:mal_int, y} | []] ->
+      {:mal_bool, f.(x, y)} 
+    end
+  end
+
   # TODO should be more specific type
   @spec ns :: %{}
   def ns do
@@ -47,10 +53,10 @@ defmodule MAL.Core do
             {:mal_nil} -> {:mal_int, 0}
           end
         end,
-      ">" => lift_int_op2(fn x, y -> x > y end),
-      ">=" => lift_int_op2(fn x, y -> x >= y end),
-      "<" => lift_int_op2(fn x, y -> x < y end),
-      "<=" => lift_int_op2(fn x, y -> x <= y end),
+      ">" => lift_cmp_op2(fn x, y -> x > y end),
+      ">=" => lift_cmp_op2(fn x, y -> x >= y end),
+      "<" => lift_cmp_op2(fn x, y -> x < y end),
+      "<=" => lift_cmp_op2(fn x, y -> x <= y end),
       "+" => lift_int_op2(fn x, y -> x + y end),
       "-" => lift_int_op2(fn x, y -> x - y end),
       "*" => lift_int_op2(fn x, y -> x * y end),

@@ -49,6 +49,12 @@ defmodule MAL.Step4 do
                 MAL.Env.set(let_env, k, eval(v, let_env))
               end)
             eval(b, let_env)
+          {:mal_symbol, "if"} -> 
+            [_, pred, t_proc, f_proc] = xs
+            case eval(pred, env) do
+              {:mal_bool, true} -> eval(t_proc, env)
+              {:mal_bool, false} -> eval(f_proc, env)
+            end
           {:mal_symbol, "fn*"} ->
             [_, params, body | _] = xs
             fn args ->
