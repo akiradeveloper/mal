@@ -61,6 +61,12 @@ defmodule MAL.Core do
       "-" => lift_int_op2(fn x, y -> x - y end),
       "*" => lift_int_op2(fn x, y -> x * y end),
       "/" => lift_int_op2(fn x, y -> div(x, y) end),
+      "=" => fn [x, y] ->
+        case {x, y} do
+          # FIXME
+          {{:mal_list, _}, {:mal_nil}} -> {:mal_bool, false}
+        end
+      end,
     } |> Dict.to_list |> Enum.map(fn {x, y} -> {x, wrap_func(y)} end)
   end
 end
