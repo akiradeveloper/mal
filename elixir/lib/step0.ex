@@ -1,4 +1,5 @@
 defmodule MAL.Step0 do
+  @spec read(String.t) :: String.t
   def read(str), do: str
   def eval(ast, env), do: ast
   def print(exp), do: exp
