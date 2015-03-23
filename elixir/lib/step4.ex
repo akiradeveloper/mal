@@ -7,7 +7,7 @@ import MAL.Types
 defmodule MAL.Step4 do
   def make_init_env do
     env = MAL.Env.new()
-    Dict.to_list(MAL.Core.ns) |> Enum.each(
+    MAL.Core.ns |> Enum.each(
       fn {k, op} ->
         MAL.Env.set(env, k, op)
       end)
