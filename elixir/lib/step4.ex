@@ -5,15 +5,6 @@ import MAL.Core
 import MAL.Types
 
 defmodule MAL.Step4 do
-  def make_init_env do
-    env = MAL.Env.new()
-    MAL.Core.ns |> Enum.each(
-      fn {k, op} ->
-        MAL.Env.set(env, k, op)
-      end)
-    env
-  end
-
   @spec read(String.t) :: MAL.Types.t
   def read(str),
   do: MAL.Reader.read_str(str)
@@ -98,7 +89,7 @@ defmodule MAL.Step4 do
   end
 
   def main do
-    env = make_init_env
+    env = MAL.Core.init_env
     Stream.repeatedly(fn ->
       line = IO.gets "user> "
       (read line) |> eval(env) |> print |> IO.puts

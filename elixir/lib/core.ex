@@ -72,4 +72,13 @@ defmodule MAL.Core do
         end,
     } |> Dict.to_list |> Enum.map(fn {x, y} -> {x, wrap_func(y)} end)
   end
+
+  def init_env do
+    env = MAL.Env.new()
+    MAL.Core.ns |> Enum.each(
+      fn {k, op} ->
+        MAL.Env.set(env, k, op)
+      end)
+    env
+  end
 end

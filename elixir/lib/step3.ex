@@ -3,24 +3,6 @@ import MAL.Printer
 import MAL.Env
 
 defmodule MAL.Step3 do
-  def lift_int_binop(f),
-  do: fn {:mal_int, x}, {:mal_int, y} -> {:mal_int, f.(x, y)} end
-
-  def make_init_env do
-    ops = %{
-      "+" => lift_int_binop(fn x, y -> x + y end),
-      "-" => lift_int_binop(fn x, y -> x - y end),
-      "*" => lift_int_binop(fn x, y -> x * y end),
-      "/" => lift_int_binop(fn x, y -> div(x, y) end)
-    }
-    env = MAL.Env.new()
-    Dict.to_list(ops) |> Enum.each(
-      fn {k, op} ->
-        MAL.Env.set(env, k, op)
-      end)
-    env
-  end
-
   def read(str),
   do: MAL.Reader.read_str(str)
 
@@ -73,7 +55,7 @@ defmodule MAL.Step3 do
   end
 
   def main do
-    env = make_init_env
+    env = MAL.Core.init_env
     loop(env)
   end
 end
