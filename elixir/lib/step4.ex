@@ -90,6 +90,7 @@ defmodule MAL.Step4 do
 
   def main do
     env = MAL.Core.init_env
+    (read "(def! not (fn* (a) (if a false true)))") |> eval(env)
     Stream.repeatedly(fn ->
       line = IO.gets "user> "
       (read line) |> eval(env) |> print |> IO.puts
