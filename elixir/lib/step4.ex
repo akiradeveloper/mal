@@ -99,6 +99,10 @@ defmodule MAL.Step4 do
 
   def main do
     env = make_init_env
-    loop(env)
+    Stream.repeatedly(fn ->
+      line = IO.gets "user> "
+      (read line) |> eval(env) |> print |> IO.puts
+    end) |> Stream.run
+    # loop(env)
   end
 end
