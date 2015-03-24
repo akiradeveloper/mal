@@ -28,7 +28,7 @@ defmodule MAL.Core do
   end
 
   # TODO should be more specific type
-  @spec ns :: %{}
+  @spec ns :: [{String.t, MAL.Types.mal_func}]
   def ns do
     %{
       "list" => fn xs -> {:mal_list, xs} end,
@@ -61,14 +61,15 @@ defmodule MAL.Core do
       "-" => lift_int_op2(fn x, y -> x - y end),
       "*" => lift_int_op2(fn x, y -> x * y end),
       "/" => lift_int_op2(fn x, y -> div(x, y) end),
-      "=" => fn [x, y] ->
-        # FIXME with meta?
-        case {x, y} do
-          {{:mal_nil}, {:mal_nil}} -> {:mal_bool, true}
-          {{t1, xs}, {t2, ys}} -> {:mal_bool, (t1 == t2) and (xs == ys)}
-          _ -> {:mal_bool, false}
-        end
-      end,
+      "=" =>
+        fn [x, y] ->
+          # FIXME with meta?
+          case {x, y} do
+            {{:mal_nil}, {:mal_nil}} -> {:mal_bool, true}
+            {{t1, xs}, {t2, ys}} -> {:mal_bool, (t1 == t2) and (xs == ys)}
+            _ -> {:mal_bool, false}
+          end
+        end,
     } |> Dict.to_list |> Enum.map(fn {x, y} -> {x, wrap_func(y)} end)
   end
 end
