@@ -59,11 +59,14 @@ defmodule MAL.Step4 do
               end)
             eval(b, let_env)
           {:mal_symbol, "if"} -> 
-            [_, pred, t_proc, f_proc] = xs
+            [_, pred, t_proc | f_proc] = xs
             if eval_true?(pred, env) do
               eval(t_proc, env)
             else
-              eval(f_proc, env)
+              case f_proc do
+                [] -> {:mal_nil}
+                [f] -> eval(f, env)
+              end
             end
           {:mal_symbol, "fn*"} ->
             [_, params, body | _] = xs
