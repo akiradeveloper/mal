@@ -70,6 +70,14 @@ defmodule MAL.Core do
             _ -> {:mal_bool, false}
           end
         end,
+      "read-string" =>
+        fn [{:mal_string, x}] ->
+          MAL.Reader.read_str(x)
+        end,
+      "slurp" =>
+        fn [{:mal_string, x}] ->
+          {:mal_string, File.read!(x)}
+        end
     } |> Dict.to_list |> Enum.map(fn {x, y} -> {x, wrap_func(y)} end)
   end
 
