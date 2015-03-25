@@ -60,9 +60,8 @@ defmodule MAL.Step4 do
               end
             end
           {:mal_symbol, "do"} ->
-            Enum.reduce(xs, fn x, _ -> 
-              eval(x, env)
-            end)
+            {:mal_list, r} = eval_ast({:mal_list, tl(xs)}, env)
+            r |> Enum.reverse |> hd # FIXME last
           {:mal_symbol, "fn*"} ->
             [_, params, body | _] = xs
             fn args ->
