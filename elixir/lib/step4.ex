@@ -77,7 +77,7 @@ defmodule MAL.Step4 do
                   MAL.Env.set(new_env, bind, expr)
                 end)
               case rest_param do
-                [{:mal_symbol, name}] -> MAL.Env.set(new_env, name, {ty, rest_args})
+                [{:mal_symbol, "&"}, {:mal_symbol, name}] -> MAL.Env.set(new_env, name, {ty, rest_args})
                 [] -> :ok
               end
               eval(body, new_env)
