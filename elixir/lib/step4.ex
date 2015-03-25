@@ -66,11 +66,20 @@ defmodule MAL.Step4 do
           {:mal_symbol, "fn*"} ->
             [_, params, body | _] = xs
             fn args ->
+              ty = elem(params, 0)
+              {binds, rest_param} = Enum.split_while(to_list(params), fn x ->
+                x != {:mal_symbol, "&"}
+              end)
+              {exprs, rest_args} = Enum.split(args, Enum.count(binds))
               new_env = MAL.Env.new(env)
-              Enum.zip(to_list(params), args) |> Enum.each(
-                fn {{:mal_symbol, name}, expr} ->
-                  MAL.Env.set(new_env, name, expr)
+              Enum.zip(binds, exprs) |> Enum.each(
+                fn {{:mal_symbol, bind}, expr} ->
+                  MAL.Env.set(new_env, bind, expr)
                 end)
+              case rest_param do
+                [{:mal_symbol, name}] -> MAL.Env.set(new_env, name, {ty, rest_args})
+                [] -> :ok
+              end
               eval(body, new_env)
             end |> wrap_func
           _ -> 
