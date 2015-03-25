@@ -59,6 +59,10 @@ defmodule MAL.Step4 do
                 [f] -> eval(f, env)
               end
             end
+          {:mal_symbol, "do"} ->
+            Enum.reduce(xs, fn x, _ -> 
+              eval_ast(x, env)
+            end)
           {:mal_symbol, "fn*"} ->
             [_, params, body | _] = xs
             fn args ->
