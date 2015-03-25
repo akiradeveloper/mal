@@ -70,6 +70,24 @@ defmodule MAL.Core do
             _ -> {:mal_bool, false}
           end
         end,
+      "pr-str" =>
+        fn xs ->
+          {:mal_string, xs |> Enum.map(fn x -> MAL.Printer.pr_str(x, true) end) |> Enum.join(" ")}
+        end,
+      "str" =>
+        fn xs ->
+          {:mal_string, xs |> Enum.map(fn x -> MAL.Printer.pr_str(x, false) end) |> Enum.join("")}
+        end,
+      "prn" =>
+        fn xs ->
+          xs |> Enum.map(fn x -> MAL.Printer.pr_str(x, true) end) |> Enum.join(" ") |> IO.puts
+          {:mal_nil}
+        end,
+      "println" =>
+        fn xs ->
+          xs |> Enum.map(fn x -> MAL.Printer.pr_str(x, false) end) |> Enum.join("") |> IO.puts
+          {:mal_nil}
+        end,
       "read-string" =>
         fn [{:mal_string, x}] ->
           MAL.Reader.read_str(x)
