@@ -92,7 +92,7 @@ defmodule MAL.Step6 do
     env = MAL.Core.init_env
     MAL.Env.set(env, "eval", fn [ast] -> eval(ast, env) end)
     (read "(def! not (fn* (a) (if a false true)))") |> eval(env)
-    (read "(def! load-file (fn* (f) (eval (read-string (str \"(do \"(slurp f) \")\")))))") |> eval(env)
+    (read "(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \")\")))))") |> eval(env)
     Stream.repeatedly(fn ->
       line = IO.gets "user> "
       (read line) |> eval(env) |> print |> IO.puts
