@@ -59,6 +59,9 @@ defmodule MAL.Step6 do
                 [f] -> eval(f, env)
               end
             end
+          {:mal_symbol, "do"} ->
+            {:mal_list, r} = eval_ast({:mal_list, tl(xs)}, env)
+            r |> Enum.reverse |> hd # FIXME last
           {:mal_symbol, "fn*"} ->
             [_, params, body | _] = xs
             fn args ->
@@ -90,13 +93,13 @@ defmodule MAL.Step6 do
 
   def main do
     env = MAL.Core.init_env
-    MAL.Env.set(env, "eval", fn [ast] -> eval(ast, env) end)
+    MAL.Env.set(env, "*ARGV*", {:mal_list, []})
+    MAL.Env.set(env, "eval", fn [ast] -> eval(ast, env) end |> wrap_func)
     (read "(def! not (fn* (a) (if a false true)))") |> eval(env)
     (read "(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \")\")))))") |> eval(env)
     Stream.repeatedly(fn ->
       line = IO.gets "user> "
       (read line) |> eval(env) |> print |> IO.puts
     end) |> Stream.run
-    # loop(env)
   end
 end
