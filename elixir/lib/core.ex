@@ -27,6 +27,10 @@ defmodule MAL.Core do
     end
   end
 
+  @spec concat([MAL.Types.mal_list]) :: Mal.Types.mal_list
+  def concat(args) do
+  end
+
   # TODO should be more specific type
   @spec ns :: [{String.t, MAL.Types.mal_func}]
   def ns do
@@ -52,6 +56,14 @@ defmodule MAL.Core do
             {:mal_list, xs} -> {:mal_int, Enum.count(xs)}
             {:mal_nil} -> {:mal_int, 0}
           end
+        end,
+      "cons" =>
+        fn [x, {:mal_list, xs}] ->
+          {:mal_list, [x | xs]}
+        end,
+      "concat" =>
+        fn xs ->
+          {:mal_list, xs |> Enum.map(&(to_list(&1))) |> Enum.concat}
         end,
       ">" => lift_cmp_op2(fn x, y -> x > y end),
       ">=" => lift_cmp_op2(fn x, y -> x >= y end),
