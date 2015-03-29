@@ -4,6 +4,7 @@
 # Regex.scan(r, "(+ 1 2)") |> IO.inspect
 
 defmodule MAL.Reader do
+
   def tokenizer(s) do
     r = ~r/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
     l = for [x, _] <- Regex.scan(r, s), do: x
@@ -24,18 +25,11 @@ defmodule MAL.Reader do
       ["(" | _] ->
         {ast, rest} = do_parse_list([], tl(toks))
         {{:mal_list, Enum.reverse(ast)}, rest}
-      ["[" | _] -> parse_vector(toks)
+      ["[" | _] -> do_parse_list([], toks)
         {ast, rest} = do_parse_list([], tl(toks))
         {{:mal_vector, Enum.reverse(ast)}, rest}
       [_ | _] -> parse_atom(toks)
     end
-  end
-
-  # :: {ast, rest}
-  def parse_list(toks) do
-  end
-
-  def parse_vector(toks) do
   end
 
   @spec do_parse_list([MAL.Types.t], [String.t]) :: {[MAL.Types.t], [String.t]}
