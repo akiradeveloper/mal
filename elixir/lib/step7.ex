@@ -14,6 +14,17 @@ defmodule MAL.Step7 do
     !Enum.empty?(xs)
   end
 
+  def quasiquote(ast) do
+    case ast do
+      {:mal_list, [{:mal_symbol, "unquote"}, ast]} -> ast
+      {ty, [{:mal_list, [{:mal_symbol, "splice-unquote"}, head]} | tail]} when ty in [:mal_list, :mal_vector] ->
+        {:mal_list, [{:mal_symbol, "concat"}, head, quasiquote({:mal_list, tail})]}
+      {ty, [head | tail]} when ty in [:mal_list, :mal_vector] ->
+        {:mal_list, [{:mal_symbol, "cons"}, quasiquote(head), quasiquote({:mal_list, tail})]}
+      _ -> {:mal_list, [{:mal_symbol, "quote"}, ast]}
+    end
+  end
+
   def eval_ast(ast, env) do
     case ast do
       {:mal_symbol, name} ->
@@ -24,15 +35,6 @@ defmodule MAL.Step7 do
       {:mal_list, xs} ->
         {:mal_list, Enum.map(xs, fn x -> eval(x, env) end)}
       _ -> ast
-    end
-  end
-
-  @spec eval_true?(MAL.Types.t, MAL.Env.t) :: boolean
-  def eval_true?(ast, env) do
-    case eval(ast, env) do
-      {:mal_bool, false} -> false
-      {:mal_nil} -> false
-      _ -> true
     end
   end
 
@@ -50,8 +52,8 @@ defmodule MAL.Step7 do
             [_, lst] = xs
             lst
           {:mal_symbol, "quasiquote"} ->
-            [_, ast] = xs
-
+            [_, lst] = xs
+            eval((quasiquote lst), env)
           {:mal_symbol, "let*"} ->
             let_env = MAL.Env.new(env)
             [_, lets, b | _] = xs
@@ -62,7 +64,7 @@ defmodule MAL.Step7 do
             eval(b, let_env)
           {:mal_symbol, "if"} -> 
             [_, pred, t_proc | f_proc] = xs
-            if eval_true?(pred, env) do
+            if to_bool(eval(pred, env)) do
               eval(t_proc, env)
             else
               case f_proc do
