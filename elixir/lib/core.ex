@@ -27,10 +27,6 @@ defmodule MAL.Core do
     end
   end
 
-  @spec concat([MAL.Types.mal_list]) :: Mal.Types.mal_list
-  def concat(args) do
-  end
-
   # TODO should be more specific type
   @spec ns :: [{String.t, MAL.Types.mal_func}]
   def ns do
@@ -58,7 +54,7 @@ defmodule MAL.Core do
           end
         end,
       "cons" =>
-        fn [x, {:mal_list, xs}] ->
+        fn [x, {type, xs}] when type in [:mal_list, :mal_vector] ->
           {:mal_list, [x | xs]}
         end,
       "concat" =>

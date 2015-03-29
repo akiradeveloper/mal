@@ -1,12 +1,4 @@
-# r = ~r/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
-# Regex.scan(r, "abc") |> IO.inspect
-# Regex.scan(r, "123") |> IO.inspect
-# Regex.scan(r, "(+ 1 2)") |> IO.inspect
-
 defmodule MAL.Reader do
-
-  @type tokens :: [String.t]
-
   def tokenizer(s) do
     r = ~r/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
     l = for [x, _] <- Regex.scan(r, s), do: x
@@ -15,11 +7,7 @@ defmodule MAL.Reader do
 
   @spec read_str(String.t) :: MAL.Types.t
   def read_str(s) do
-    read_form(tokenizer(s))
-  end
-
-  def read_form(toks) do
-    elem(parse_form(toks), 0)
+    s |> tokenizer |> parse_form |> elem(0)
   end
 
   @spec parse_form([String.t]) :: {MAL.Types.t, [String.t]}

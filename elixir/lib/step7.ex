@@ -17,9 +17,9 @@ defmodule MAL.Step7 do
   def quasiquote(ast) do
     case ast do
       {:mal_list, [{:mal_symbol, "unquote"}, ast]} -> ast
-      {ty, [{:mal_list, [{:mal_symbol, "splice-unquote"}, head]} | tail]} when ty in [:mal_list, :mal_vector] ->
+      {type, [{:mal_list, [{:mal_symbol, "splice-unquote"}, head]} | tail]} when type in [:mal_list, :mal_vector] ->
         {:mal_list, [{:mal_symbol, "concat"}, head, quasiquote({:mal_list, tail})]}
-      {ty, [head | tail]} when ty in [:mal_list, :mal_vector] ->
+      {type, [head | tail]} when type in [:mal_list, :mal_vector] ->
         {:mal_list, [{:mal_symbol, "cons"}, quasiquote(head), quasiquote({:mal_list, tail})]}
       _ -> {:mal_list, [{:mal_symbol, "quote"}, ast]}
     end
