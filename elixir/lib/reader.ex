@@ -20,27 +20,32 @@ defmodule MAL.Reader do
     elem(parse_form(toks), 0)
   end
 
+  @spec parse_form([String.t]) :: {MAL.Types.t, [String.t]}
   def parse_form(toks) do
     case toks do
+      ["'" | _] ->
+        parse_quote("quote", tl(toks))
       ["(" | _] ->
-        {ast, rest} = do_parse_list([], tl(toks))
+        {ast, rest} = parse_list([], tl(toks), ")")
         {{:mal_list, Enum.reverse(ast)}, rest}
-      ["[" | _] -> do_parse_list([], toks)
-        {ast, rest} = do_parse_list([], tl(toks))
+      ["[" | _] ->
+        {ast, rest} = parse_list([], tl(toks), "]")
         {{:mal_vector, Enum.reverse(ast)}, rest}
       [_ | _] -> parse_atom(toks)
     end
   end
 
-  @spec do_parse_list([MAL.Types.t], [String.t]) :: {[MAL.Types.t], [String.t]}
-  def do_parse_list(acc, toks) do
+  @spec parse_list([MAL.Types.t], [String.t], String.t) :: {[MAL.Types.t], [String.t]}
+  def parse_list(acc, toks, closer) do
     case toks do
-      [")" | rest] -> {acc, rest}
-      ["]" | rest] -> {acc, rest}
+      [tok | rest] when tok == closer -> {acc, rest}
       [_ | _] ->
         {ast, rest} = parse_form(toks)
-        do_parse_list([ast | acc], rest)
+        parse_list([ast | acc], rest, closer)
     end
+  end
+
+  def parse_quote(symbol, toks) do
   end
 
   @spec parse_atom([String.t]) :: {MAL.Types.t, [String.t]}
