@@ -27,6 +27,15 @@ defmodule MAL.Types do
   def wrap_func(f),
   do: {:mal_func, f}
 
+  @spec to_bool(t) :: boolean
+  def to_bool(ast) do
+    case ast do
+      {:mal_bool, false} -> false
+      {:mal_nil} -> false
+      _ -> true
+    end
+  end
+
   @spec to_list(t) :: [t]
   def to_list(ast) do
     case ast do

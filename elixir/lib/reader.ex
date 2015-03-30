@@ -4,6 +4,9 @@
 # Regex.scan(r, "(+ 1 2)") |> IO.inspect
 
 defmodule MAL.Reader do
+
+  @type tokens :: [String.t]
+
   def tokenizer(s) do
     r = ~r/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
     l = for [x, _] <- Regex.scan(r, s), do: x
@@ -19,33 +22,34 @@ defmodule MAL.Reader do
     elem(parse_form(toks), 0)
   end
 
+  @spec parse_form([String.t]) :: {MAL.Types.t, [String.t]}
   def parse_form(toks) do
     case toks do
+      ["'" | _] -> parse_quote("quote", tl(toks))
+      ["`" | _] -> parse_quote("quasiquote", tl(toks))
       ["(" | _] ->
-        {ast, rest} = do_parse_list([], tl(toks))
+        {ast, rest} = parse_list([], tl(toks), ")")
         {{:mal_list, Enum.reverse(ast)}, rest}
-      ["[" | _] -> parse_vector(toks)
-        {ast, rest} = do_parse_list([], tl(toks))
+      ["[" | _] ->
+        {ast, rest} = parse_list([], tl(toks), "]")
         {{:mal_vector, Enum.reverse(ast)}, rest}
       [_ | _] -> parse_atom(toks)
     end
   end
 
-  # :: {ast, rest}
-  def parse_list(toks) do
+  @spec parse_quote(String.t, [String.t]) :: {MAL.Types.t, [String.t]}
+  def parse_quote(symbol, toks) do
+    {tok, rest} = parse_form(toks)
+    {{:mal_list, [{:mal_symbol, symbol}, tok]}, rest}
   end
 
-  def parse_vector(toks) do
-  end
-
-  @spec do_parse_list([MAL.Types.t], [String.t]) :: {[MAL.Types.t], [String.t]}
-  def do_parse_list(acc, toks) do
+  @spec parse_list([MAL.Types.t], [String.t], String.t) :: {[MAL.Types.t], [String.t]}
+  def parse_list(acc, toks, closer) do
     case toks do
-      [")" | rest] -> {acc, rest}
-      ["]" | rest] -> {acc, rest}
+      [tok | rest] when tok == closer -> {acc, rest}
       [_ | _] ->
         {ast, rest} = parse_form(toks)
-        do_parse_list([ast | acc], rest)
+        parse_list([ast | acc], rest, closer)
     end
   end
 
