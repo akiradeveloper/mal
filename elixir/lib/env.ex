@@ -10,6 +10,7 @@ defmodule MAL.Env do
   end
 
   def do_find(env, k) do
+    # FIXME if env is nil?
     e = env.data[k]
     if e do
       env

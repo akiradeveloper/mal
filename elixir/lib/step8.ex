@@ -35,8 +35,8 @@ defmodule MAL.Step8 do
 
   defp is_macro_call(ast, env) do
     case ast do
-      mal_list(value: [mal_symbol(value: x)|_]) ->
-        case MAL.Env.find(env, x) do
+      mal_list(value: [mal_symbol(value: name) | _]) ->
+        case MAL.Env.get(env, name) do
           mal_func(is_macro: true) -> true
           mal_func(is_macro: false) -> false
           _ -> false
@@ -48,9 +48,9 @@ defmodule MAL.Step8 do
   defp macroexpand(ast, env) do
     if is_macro_call(ast, env) do
       case ast do
-        mal_list(value: [mal_symbol(value: name)|args]) ->
-          case MAL.Env.find(env, v) do
-            mal_func(value: f) -> macroexpand(f(args), env)
+        mal_list(value: [mal_symbol(value: name) | args]) ->
+          case MAL.Env.get(env, name) do
+            mal_func(value: f) -> macroexpand(f.(args), env)
             _ -> ast
           end
         _  -> ast
@@ -62,7 +62,7 @@ defmodule MAL.Step8 do
 
   @spec eval(MAL.Types.t, MAL.Env.t) :: MAL.Types.t
   def eval(ast, env) do
-    case ast do
+    case macroexpand(ast, env) do
       mal_list(value: xs) ->
         case hd(xs) do
           mal_symbol(value: "def!") ->
@@ -122,6 +122,9 @@ defmodule MAL.Step8 do
               end
               eval(body, new_env)
             end |> wrap_func
+          mal_symbol(value: "macroexpand") ->
+            [_, lst] = xs
+            macroexpand(lst, env)
           _ -> 
             l = eval_ast(ast, env)
             mal_list(value: [mal_func(value: f) | args]) = l
