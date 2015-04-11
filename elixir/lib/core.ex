@@ -22,7 +22,7 @@ defmodule MAL.Core do
   end
 
   def lift_cmp_op2(f) do
-    fn [mal_int(value: x), {:mal_int, y} | []] ->
+    fn [mal_int(value: x), mal_int(value: y) | []] ->
       mal_bool(value: f.(x, y))
     end
   end
