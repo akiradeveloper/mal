@@ -11,13 +11,13 @@ defmodule MAL.Step6 do
 
   def eval_ast(ast, env) do
     case ast do
-      {:mal_symbol, name} ->
+      mal_symbol(value: name) ->
         case MAL.Env.get(env, name) do
           nil -> raise ArgumentError, message: "#{name} not found"
           x -> x
         end
-      {:mal_list, xs} ->
-        {:mal_list, Enum.map(xs, fn x -> eval(x, env) end)}
+      mal_list(value: xs) ->
+        mal_list(value: Enum.map(xs, fn x -> eval(x, env) end))
       _ -> ast
     end
   end
@@ -25,8 +25,8 @@ defmodule MAL.Step6 do
   @spec eval_true?(MAL.Types.t, MAL.Env.t) :: boolean
   def eval_true?(ast, env) do
     case eval(ast, env) do
-      {:mal_bool, false} -> false
-      {:mal_nil} -> false
+      mal_bool(value: false) -> false
+      :mal_nil -> false
       _ -> true
     end
   end
@@ -34,47 +34,55 @@ defmodule MAL.Step6 do
   @spec eval(MAL.Types.t, MAL.Env.t) :: MAL.Types.t
   def eval(ast, env) do
     case ast do
-      {:mal_list, xs} ->
+      mal_list(value: xs) ->
         case hd(xs) do
-          {:mal_symbol, "def!"} ->
-            [_, {:mal_symbol, a}, b | _] = xs
+          mal_symbol(value: "def!") ->
+            [_, mal_symbol(value: a), b | _] = xs
             val = eval(b, env)
             MAL.Env.set(env, a, val)
             val
-          {:mal_symbol, "let*"} ->
+          mal_symbol(value: "let*") ->
             let_env = MAL.Env.new(env)
             [_, lets, b | _] = xs
             Enum.chunk(to_list(lets), 2) |> Enum.each(
-              fn [{:mal_symbol, k}, v] ->
+              fn [mal_symbol(value: k), v] ->
                 MAL.Env.set(let_env, k, eval(v, let_env))
               end)
             eval(b, let_env)
-          {:mal_symbol, "if"} -> 
+          mal_symbol(value: "if") ->
             [_, pred, t_proc | f_proc] = xs
             if eval_true?(pred, env) do
               eval(t_proc, env)
             else
               case f_proc do
-                [] -> {:mal_nil}
+                [] -> :mal_nil
                 [f] -> eval(f, env)
               end
             end
-          {:mal_symbol, "do"} ->
-            {:mal_list, r} = eval_ast({:mal_list, tl(xs)}, env)
+          mal_symbol(value: "do") ->
+            mal_list(value: r) = eval_ast(mal_list(value: tl(xs)), env)
             r |> Enum.reverse |> hd # FIXME last
-          {:mal_symbol, "fn*"} ->
+          mal_symbol(value: "fn*") ->
             [_, params, body | _] = xs
             fn args ->
+              {binds, rest_param} = Enum.split_while(to_list(params), fn x ->
+                x != mal_symbol(value: "&")
+              end)
+              {exprs, rest_args} = Enum.split(args, Enum.count(binds))
               new_env = MAL.Env.new(env)
               Enum.zip(to_list(params), args) |> Enum.each(
-                fn {{:mal_symbol, name}, expr} ->
+                fn {mal_symbol(value: name), expr} ->
                   MAL.Env.set(new_env, name, expr)
                 end)
+              case rest_param do
+                [mal_symbol(value: "&"), mal_symbol(value: name)] -> MAL.Env.set(new_env, name, mal_list(value: rest_args))
+                [] -> :ok
+              end
               eval(body, new_env)
             end |> wrap_func
           _ -> 
             l = eval_ast(ast, env)
-            {:mal_list, [{:mal_func, f} | args]} = l
+            mal_list(value: [mal_func(value: f) | args]) = l
             f.(args)
         end
       _ -> eval_ast(ast, env)
@@ -93,7 +101,7 @@ defmodule MAL.Step6 do
 
   def main do
     env = MAL.Core.init_env
-    MAL.Env.set(env, "*ARGV*", {:mal_list, []})
+    MAL.Env.set(env, "*ARGV*", mal_list(value: []))
     MAL.Env.set(env, "eval", fn [ast] -> eval(ast, env) end |> wrap_func)
     (read "(def! not (fn* (a) (if a false true)))") |> eval(env)
     (read "(def! load-file (fn* (f) (eval (read-string (str \"(do \"(slurp f) \")\")))))") |> eval(env)

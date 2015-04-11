@@ -1,4 +1,5 @@
 defmodule MAL.Printer do
+  import MAL.Types
 
   def unescape(chr) do
   end
@@ -6,20 +7,20 @@ defmodule MAL.Printer do
   @spec pr_str(MAL.Types.t) :: String.t
   def pr_str(ast, pr \\ false) do
     case ast do
-      {:mal_func, _} -> "#<function>"
-      {:mal_list, val} ->
-        l = val |> Enum.map(&(pr_str(&1, pr))) |> Enum.join(" ")
+      mal_func(value: _) -> "#<function>"
+      mal_list(value: xs) ->
+        l = xs |> Enum.map(&(pr_str(&1, pr))) |> Enum.join(" ")
         "(" <> l <> ")"
-      {:mal_vector, val} ->
-        l = val |> Enum.map(&(pr_str(&1, pr))) |> Enum.join(" ")
+      mal_vector(value: xs) ->
+        l = xs |> Enum.map(&(pr_str(&1, pr))) |> Enum.join(" ")
         "[" <> l <> "]"
-      {:mal_int, val} -> to_string(val)
-      {:mal_symbol, val} -> val
-      {:mal_kw, val} -> ":#{val}"
-      {:mal_bool, true} -> "true"
-      {:mal_bool, false} -> "false"
-      {:mal_nil} -> "nil"
-      {:mal_string, val} ->
+      mal_int(value: val) -> to_string(val)
+      mal_symbol(value: val) -> val
+      mal_kw(value: val) -> ":#{val}"
+      mal_bool(value: true) -> "true"
+      mal_bool(value: false) -> "false"
+      :mal_nil -> "nil"
+      mal_string(value: val) ->
         case pr do
           true -> "\"#{
             val |>
@@ -40,8 +41,9 @@ defmodule MAL.Printer do
   end
 end
 
-IO.puts MAL.Printer.pr_str({:mal_func, 1})
-IO.puts MAL.Printer.pr_str({:mal_int, 1})
-IO.puts MAL.Printer.pr_str({:mal_list, [{:mal_int, 1},{:mal_int, 2}]})
-IO.puts MAL.Printer.pr_str({:mal_vector, [{:mal_int, 1},{:mal_int, 2}]})
-IO.puts MAL.Printer.pr_str({:mal_string, "akiradeveloper"})
+import MAL.Types
+IO.puts MAL.Printer.pr_str(mal_func(value: 1))
+IO.puts MAL.Printer.pr_str(mal_int(value: 1))
+IO.puts MAL.Printer.pr_str(mal_list(value: [mal_int(value: 1),mal_int(value: 2)]))
+IO.puts MAL.Printer.pr_str(mal_vector(value: [mal_int(value: 1),mal_int(value: 2)]))
+IO.puts MAL.Printer.pr_str(mal_string(value: "akiradeveloper"))

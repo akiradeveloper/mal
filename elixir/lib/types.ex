@@ -1,5 +1,15 @@
 defmodule MAL.Types do
 
+  require Record
+  Record.defrecord :mal_list, value: nil, meta: :mal_nil
+  Record.defrecord :mal_vector, value: nil, meta: :mal_nil
+  Record.defrecord :mal_int, value: nil
+  Record.defrecord :mal_bool, value: nil
+  Record.defrecord :mal_kw, value: nil
+  Record.defrecord :mal_func, value: nil, is_macro: false, meta: :mal_nil
+  Record.defrecord :mal_symbol, value: nil, meta: :mal_nil
+  Record.defrecord :mal_string, value: nil
+
   @type t ::
       mal_int
     | mal_kw
@@ -10,28 +20,23 @@ defmodule MAL.Types do
     | mal_string
     | mal_symbol
     | mal_func
-    
-  @type mal_nil :: {:mal_nil}
-  @type mal_int :: {:mal_int, integer}
-  @type mal_symbol :: {:mal_symbol, String.t}
-  @type mal_string :: {:mal_string, String.t}
-  @type mal_kw :: {:mal_kw, String.t}
-  @type mal_bool :: {:mal_bool, boolean}
-  @type mal_list :: {:mal_list, [t]}
-  @type mal_vector :: {:mal_vector, [t]}
-  @type mal_func :: {:mal_func, func}
 
+  @type mal_nil :: :mal_nil
+  @type mal_int :: record(:mal_int, value: integer)
+  @type mal_symbol :: record(:mal_symbol, value: String.t, meta: t)
+  @type mal_string :: record(:mal_string, value: String.t)
+  @type mal_kw :: record(:mal_kw, value: String.t)
+  @type mal_bool :: record(:mal_bool, value: boolean)
+  @type mal_list :: record(:mal_list, value: [t], meta: t)
+  @type mal_vector :: record(:mal_vector, value: [t], meta: t)
+  @type mal_func :: record(:mal_func, value: func, is_macro: boolean, meta: t)
   @typep func :: ([t] -> t)
- 
-  @spec wrap_func(func) :: mal_func
-  def wrap_func(f),
-  do: {:mal_func, f}
 
   @spec to_bool(t) :: boolean
   def to_bool(ast) do
     case ast do
-      {:mal_bool, false} -> false
-      {:mal_nil} -> false
+      mal_bool(value: false) -> false
+      :mal_nil -> false
       _ -> true
     end
   end
@@ -39,9 +44,11 @@ defmodule MAL.Types do
   @spec to_list(t) :: [t]
   def to_list(ast) do
     case ast do
-      {:mal_list, xs} -> xs
-      {:mal_vector, xs} -> xs
+      mal_list(value: xs) -> xs
+      mal_vector(value: xs) -> xs
       _ -> raise ArgumentError, message: "type unmatch"
     end
   end
+
+  def wrap_func(f), do: mal_func(value: f)
 end

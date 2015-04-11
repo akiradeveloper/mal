@@ -1,4 +1,6 @@
 defmodule MAL.Reader do
+  import MAL.Types
+
   def tokenizer(s) do
     r = ~r/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
     l = for [x, _] <- Regex.scan(r, s), do: x
@@ -17,10 +19,10 @@ defmodule MAL.Reader do
       ["`" | _] -> parse_quote("quasiquote", tl(toks))
       ["(" | _] ->
         {ast, rest} = parse_list([], tl(toks), ")")
-        {{:mal_list, Enum.reverse(ast)}, rest}
+        {mal_list(value: Enum.reverse(ast)), rest}
       ["[" | _] ->
         {ast, rest} = parse_list([], tl(toks), "]")
-        {{:mal_vector, Enum.reverse(ast)}, rest}
+        {mal_vector(value: Enum.reverse(ast)), rest}
       [_ | _] -> parse_atom(toks)
     end
   end
@@ -28,7 +30,7 @@ defmodule MAL.Reader do
   @spec parse_quote(String.t, [String.t]) :: {MAL.Types.t, [String.t]}
   def parse_quote(symbol, toks) do
     {tok, rest} = parse_form(toks)
-    {{:mal_list, [{:mal_symbol, symbol}, tok]}, rest}
+    {mal_list(value: [mal_symbol(value: symbol), tok]), rest}
   end
 
   @spec parse_list([MAL.Types.t], [String.t], String.t) :: {[MAL.Types.t], [String.t]}
@@ -45,15 +47,15 @@ defmodule MAL.Reader do
   def parse_atom(toks) do
     [tok | rest] = toks
     ast = cond do 
-      Integer.parse(tok) != :error -> {:mal_int, elem(Integer.parse(tok), 0)}
+      Integer.parse(tok) != :error -> mal_int(value: elem(Integer.parse(tok), 0))
       true -> case tok do
-        "nil" -> {:mal_nil}
-        "true" -> {:mal_bool, true}
-        "false" -> {:mal_bool, false}
+        "nil" -> :mal_nil
+        "true" -> mal_bool(value: true)
+        "false" -> mal_bool(value: false)
         _ -> case hd(to_char_list(tok)) do
-          58 -> {:mal_kw, to_char_list(tok) |> tl |> to_string} # : = 58
-          34 -> {:mal_string, tok |> String.strip(?\")} # " = 34
-          _ -> {:mal_symbol, tok}
+          58 -> mal_kw(value: to_char_list(tok) |> tl |> to_string) # : = 58
+          34 -> mal_string(value: tok |> String.strip(?\")) # " = 34
+          _ -> mal_symbol(value: tok)
         end
       end
     end
