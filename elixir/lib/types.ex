@@ -50,5 +50,6 @@ defmodule MAL.Types do
     end
   end
 
+  @spec wrap_func(func) :: mal_func
   def wrap_func(f), do: mal_func(value: f)
 end

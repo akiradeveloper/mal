@@ -23,7 +23,7 @@ defmodule MAL.Env do
     if e do
       e.data[k]
     else
-      raise ArgumentError, message: "#{k} not found"
+      :mal_nil
     end
   end
 
@@ -39,13 +39,13 @@ defmodule MAL.Env do
   def set(pid, k, v),
   do: Agent.update(pid, fn env -> do_set(env, k, v) end)
 
-  def show(pid),
+  defp show(pid),
   do: Agent.get(pid, fn env -> env end)
 
-  def find(pid, k),
+  defp find(pid, k),
   do: Agent.get(pid, fn env -> do_find(env, k) end)
 
-  @spec find(t, String.t) :: MAL.Types.t
+  @spec get(t, String.t) :: MAL.Types.t
   def get(pid, k),
   do: Agent.get(pid, fn env -> do_get(env, k) end)
 end

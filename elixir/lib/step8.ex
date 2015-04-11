@@ -4,7 +4,7 @@ import MAL.Env
 import MAL.Core
 import MAL.Types
 
-defmodule MAL.Step7 do
+defmodule MAL.Step8 do
   @spec read(String.t) :: MAL.Types.t
   def read(str),
   do: MAL.Reader.read_str(str)
@@ -33,6 +33,33 @@ defmodule MAL.Step7 do
     end
   end
 
+  defp is_macro_call(ast, env) do
+    case ast do
+      mal_list(value: [mal_symbol(value: x)|_]) ->
+        case MAL.Env.find(env, x) do
+          mal_func(is_macro: true) -> true
+          mal_func(is_macro: false) -> false
+          _ -> false
+        end
+      _ -> false
+    end
+  end
+
+  defp macroexpand(ast, env) do
+    if is_macro_call(ast, env) do
+      case ast do
+        mal_list(value: [mal_symbol(value: name)|args]) ->
+          case MAL.Env.find(env, v) do
+            mal_func(value: f) -> macroexpand(f(args), env)
+            _ -> ast
+          end
+        _  -> ast
+      end
+    else
+      ast
+    end
+  end
+
   @spec eval(MAL.Types.t, MAL.Env.t) :: MAL.Types.t
   def eval(ast, env) do
     case ast do
@@ -43,6 +70,13 @@ defmodule MAL.Step7 do
             val = eval(b, env)
             MAL.Env.set(env, a, val)
             val
+          mal_symbol(value: "defmacro!") ->
+            [_, mal_symbol(value: a), b | _] = xs
+            val = eval(b, env)
+            case val do
+              mal_func(value: f) -> MAL.Env.set(env, a, mal_func(val, is_macro: true))
+              _ -> raise ArgumentError, message: "defmacro! value must be a fn"
+            end
           mal_symbol(value: "quote") ->
             [_, lst] = xs
             lst
@@ -72,7 +106,7 @@ defmodule MAL.Step7 do
             r |> Enum.reverse |> hd # FIXME last
           mal_symbol(value: "fn*") ->
             [_, params, body | _] = xs
-            fn args ->
+            fn args -> # :: [MAL.Types.t]
               {binds, rest_param} = Enum.split_while(to_list(params), fn x ->
                 x != mal_symbol(value: "&")
               end)

@@ -10,7 +10,7 @@ defmodule MAL.Step3 do
     case ast do
       {:mal_symbol, name} ->
         case MAL.Env.get(env, name) do
-          nil -> raise ArgumentError, message: "#{name} not found"
+          :mal_nil -> raise ArgumentError, message: "#{name} not found"
           x -> x
         end
       {:mal_list, xs} ->
