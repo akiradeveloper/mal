@@ -10,12 +10,15 @@ defmodule MAL.Env do
   end
 
   def do_find(env, k) do
-    # FIXME if env is nil?
     e = env.data[k]
     if e do
       env
     else
-      find(env.outer, k)
+      if env.outer do
+        find(env.outer, k)
+      else
+        nil
+      end
     end
   end
 
@@ -61,3 +64,4 @@ IO.inspect e2
 MAL.Env.set(e2, "b", 2)
 MAL.Env.get(e2, "b") |> IO.inspect
 MAL.Env.get(e2, "a") |> IO.inspect
+MAL.Env.get(e2, "notfound") |> IO.inspect
