@@ -63,6 +63,18 @@ defmodule MAL.Core do
         fn xs ->
           mal_list(value: xs |> Enum.map(&(to_list(&1))) |> Enum.concat)
         end,
+      "nth" =>
+        fn [lst, mal_int(value: idx)] ->
+          Enum.fetch!(to_list(lst), idx)
+        end,
+      "first" =>
+        fn [lst] ->
+          hd(to_list(lst))
+        end,
+      "rest" =>
+        fn [lst] ->
+          mal_list(value: tl(to_list(lst)))
+        end,
       ">" => lift_cmp_op2(fn x, y -> x > y end),
       ">=" => lift_cmp_op2(fn x, y -> x >= y end),
       "<" => lift_cmp_op2(fn x, y -> x < y end),
