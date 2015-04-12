@@ -17,6 +17,9 @@ defmodule MAL.Reader do
     case toks do
       ["'" | _] -> parse_quote("quote", tl(toks))
       ["`" | _] -> parse_quote("quasiquote", tl(toks))
+      ["~" | _] -> parse_quote("unquote", tl(toks))
+      ["~@" | _] -> parse_quote("splice-unquote", tl(toks))
+      ["@" | _] -> parse_quote("deref", tl(toks))
       ["(" | _] ->
         {ast, rest} = parse_list([], tl(toks), ")")
         {mal_list(value: Enum.reverse(ast)), rest}
