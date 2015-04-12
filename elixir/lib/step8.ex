@@ -152,7 +152,11 @@ defmodule MAL.Step8 do
     (read "(def! load-file (fn* (f) (eval (read-string (str \"(do \"(slurp f) \")\")))))") |> eval(env)
     Stream.repeatedly(fn ->
       line = IO.gets "user> "
-      (read line) |> eval(env) |> print |> IO.puts
+      try do
+        (read line) |> eval(env) |> print |> IO.puts
+      rescue
+        x -> IO.puts "error"
+      end
     end) |> Stream.run
   end
 end
