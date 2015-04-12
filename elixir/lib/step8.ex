@@ -22,15 +22,9 @@ defmodule MAL.Step8 do
 
   def eval_ast(ast, env) do
     case ast do
-      mal_symbol(value: name) ->
-        case MAL.Env.get(env, name) do
-          :mal_nil -> raise ArgumentError, message: "#{name} not found"
-          x -> x
-        end
-      mal_list(value: xs) ->
-        mal_list(value: Enum.map(xs, fn x -> eval(x, env) end))
-      _ ->
-        ast
+      mal_symbol(value: name) -> MAL.Env.get(env, name)
+      mal_list(value: xs) -> mal_list(value: Enum.map(xs, fn x -> eval(x, env) end))
+      _ -> ast
     end
   end
 
@@ -145,12 +139,6 @@ defmodule MAL.Step8 do
   def print(exp),
   do: MAL.Printer.pr_str(exp, true)
 
-  def loop(env) do
-    line = IO.gets "user> "
-    (read line) |> eval(env) |> print |> IO.puts
-    loop(env)
-  end
-
   def main do
     env = MAL.Core.init_env
     MAL.Env.set(env, "*ARGV*", mal_list(value: []))
@@ -164,6 +152,7 @@ defmodule MAL.Step8 do
       try do
         (read line) |> eval(env) |> print |> IO.puts
       rescue
+        # x -> IO.puts x
         x -> IO.puts "runtime error"
       end
     end) |> Stream.run
