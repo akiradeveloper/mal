@@ -68,13 +68,14 @@ defmodule MAL.Core do
           Enum.fetch!(to_list(lst), idx)
         end,
       "first" =>
-        fn [lst] ->
-          case to_list(lst) do
-            [] -> :mal_nil
-            xs -> hd(xs)
-          end
-           :mal_nil -> :mal_nil
-           _ -> raise ArgumentError
+        fn
+          [:mal_nil] -> :mal_nil
+          [lst] ->
+            case to_list(lst) do
+              [] -> :mal_nil
+              xs -> hd(xs)
+            end
+          _ -> raise ArgumentError
         end,
       "rest" =>
         fn [lst] ->
