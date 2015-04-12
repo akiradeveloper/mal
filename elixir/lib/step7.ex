@@ -12,7 +12,7 @@ defmodule MAL.Step7 do
   def quasiquote(ast) do
     case ast do
       {listlike, [mal_symbol(value: "unquote"), ast], _} when listlike in [:mal_list, :mal_vector] -> ast
-      {listlike, [{:mal_list, [{:mal_symbol, "splice-unquote"}, head]} | tail], _} when listlike in [:mal_list, :mal_vector] ->
+      {listlike, [mal_list(value: [mal_symbol(value: "splice-unquote"), head]) | tail], _} when listlike in [:mal_list, :mal_vector] ->
         mal_list(value: [mal_symbol(value: "concat"), head, quasiquote(mal_list(value: tail))])
       {listlike, [head | tail], _} when listlike in [:mal_list, :mal_vector] ->
         mal_list(value: [mal_symbol(value: "cons"), quasiquote(head), quasiquote(mal_list(value: tail))])
@@ -99,7 +99,7 @@ defmodule MAL.Step7 do
 
   @spec print(MAL.Types.t) :: String.t
   def print(exp),
-  do: MAL.Printer.pr_str(exp)
+  do: MAL.Printer.pr_str(exp, true)
 
   def loop(env) do
     line = IO.gets "user> "

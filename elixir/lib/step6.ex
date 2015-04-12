@@ -91,7 +91,7 @@ defmodule MAL.Step6 do
 
   @spec print(MAL.Types.t) :: String.t
   def print(exp),
-  do: MAL.Printer.pr_str(exp)
+  do: MAL.Printer.pr_str(exp, true)
 
   def loop(env) do
     line = IO.gets "user> "
