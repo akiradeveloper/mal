@@ -21,6 +21,7 @@ defmodule MAL.Step8 do
   end
 
   def eval_ast(ast, env) do
+    # IO.inspect ast
     case ast do
       mal_symbol(value: name) ->
         case MAL.Env.get(env, name) do
@@ -28,8 +29,11 @@ defmodule MAL.Step8 do
           x -> x
         end
       mal_list(value: xs) ->
+        # IO.puts "eval ast list"
         mal_list(value: Enum.map(xs, fn x -> eval(x, env) end))
-      _ -> ast
+      _ ->
+        # IO.puts "eval ast else"
+        ast
     end
   end
 
@@ -46,23 +50,35 @@ defmodule MAL.Step8 do
   end
 
   defp macroexpand(ast, env) do
+    # IO.puts "macroexpand"
     if is_macro_call(ast, env) do
       case ast do
         mal_list(value: [mal_symbol(value: name) | args]) ->
           case MAL.Env.get(env, name) do
-            mal_func(value: f) -> macroexpand(f.(args), env)
-            _ -> ast
+            mal_func(value: f) ->
+              # IO.puts "a"
+              macroexpand(f.(args), env)
+            _ ->
+              # IO.puts "b"
+              ast
           end
-        _  -> ast
+        _  ->
+          # IO.puts "c"
+          ast
       end
     else
+      # IO.puts "d"
+      # IO.inspect ast
       ast
     end
   end
 
   @spec eval(MAL.Types.t, MAL.Env.t) :: MAL.Types.t
   def eval(ast, env) do
-    case macroexpand(ast, env) do
+    # IO.puts "eval"
+    # IO.inspect ast
+    ast = macroexpand(ast, env)
+    case ast do
       mal_list(value: xs) ->
         case hd(xs) do
           mal_symbol(value: "def!") ->
@@ -77,6 +93,7 @@ defmodule MAL.Step8 do
               mal_func(value: f) -> MAL.Env.set(env, a, mal_func(val, is_macro: true))
               _ -> raise ArgumentError, message: "defmacro! value must be a fn"
             end
+            val
           mal_symbol(value: "quote") ->
             [_, lst] = xs
             lst
@@ -126,11 +143,15 @@ defmodule MAL.Step8 do
             [_, lst] = xs
             macroexpand(lst, env)
           _ -> 
+            # IO.puts "eval list else"
             l = eval_ast(ast, env)
             mal_list(value: [mal_func(value: f) | args]) = l
             f.(args)
         end
-      _ -> eval_ast(ast, env)
+      _ ->
+        # IO.puts "eval else"
+        # IO.inspect ast
+        eval_ast(ast, env)
     end
   end
 
