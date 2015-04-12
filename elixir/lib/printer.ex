@@ -6,8 +6,6 @@ defmodule MAL.Printer do
 
   @spec pr_str(MAL.Types.t) :: String.t
   def pr_str(ast, pr \\ false) do
-    # IO.puts "print"
-    # IO.inspect ast
     case ast do
       mal_func(value: _) -> "#<function>"
       mal_list(value: xs) ->
