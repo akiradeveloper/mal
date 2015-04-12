@@ -69,11 +69,19 @@ defmodule MAL.Core do
         end,
       "first" =>
         fn [lst] ->
-          hd(to_list(lst))
+          case to_list(lst) do
+            [] -> :mal_nil
+            xs -> hd(xs)
+          end
+           :mal_nil -> :mal_nil
+           _ -> raise ArgumentError
         end,
       "rest" =>
         fn [lst] ->
-          mal_list(value: tl(to_list(lst)))
+          case to_list(lst) do
+            [] -> mal_list(value: [])
+            xs -> mal_list(value: tl(xs))
+          end
         end,
       ">" => lift_cmp_op2(fn x, y -> x > y end),
       ">=" => lift_cmp_op2(fn x, y -> x >= y end),

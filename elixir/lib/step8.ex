@@ -155,7 +155,7 @@ defmodule MAL.Step8 do
       try do
         (read line) |> eval(env) |> print |> IO.puts
       rescue
-        x -> IO.puts "error"
+        x -> IO.puts "runtime error"
       end
     end) |> Stream.run
   end
