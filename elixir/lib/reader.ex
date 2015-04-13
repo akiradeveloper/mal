@@ -3,7 +3,7 @@ defmodule MAL.Reader do
 
   def tokenizer(s) do
     r = ~r/[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)/
-    l = for [x, _] <- Regex.scan(r, s), do: x
+    l = for [_, x] <- Regex.scan(r, s), do: x
     List.delete_at(l, Enum.count(l) - 1) |> Enum.map (&(String.strip(&1)))
   end
 
