@@ -130,8 +130,7 @@ defmodule MAL.Step8 do
             mal_list(value: [mal_func(value: f) | args]) = l
             f.(args)
         end
-      _ ->
-        eval_ast(ast, env)
+      _ -> eval_ast(ast, env)
     end
   end
 

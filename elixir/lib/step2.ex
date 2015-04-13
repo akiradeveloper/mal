@@ -2,8 +2,10 @@ import MAL.Reader
 import MAL.Printer
 
 defmodule MAL.Step2 do
+  import MAL.Types
+
   def lift_int_binop(f),
-  do: fn {:mal_int, x}, {:mal_int, y} -> {:mal_int, f.(x, y)} end
+  do: fn mal_int(value: x), mal_int(value: y) -> mal_int(value: f.(x, y)) end
 
   def repl_env do
     %{
@@ -19,13 +21,8 @@ defmodule MAL.Step2 do
 
   def eval_ast(ast, env) do
     case ast do
-      {:mal_symbol, name} ->
-        case env[name] do
-          nil -> raise ArgumentError, message: "#{name} not found"
-          x -> x
-        end
-      {:mal_list, xs} ->
-        {:mal_list, Enum.map(xs, fn x -> eval(x, env) end)}
+      mal_symbol(value: name) -> env[name]
+      mal_list(value: xs) -> mal_list(value: Enum.map(xs, fn x -> eval(x, env) end))
       _ -> ast
     end
   end
@@ -33,9 +30,9 @@ defmodule MAL.Step2 do
   def eval(ast, env) do
     # IO.inspect ast
     case ast do
-      {:mal_list, xs} ->
+      mal_list(value: xs) ->
         l = eval_ast(ast, env)
-        {:mal_list, [f | args]} = l
+        mal_list(value: [f | args]) = l
         apply(f, args)
       _ -> eval_ast(ast, env)
     end
@@ -50,7 +47,11 @@ defmodule MAL.Step2 do
   def main do
     line = IO.gets "user> "
     # requires newline
-    (rep line) |> IO.puts
+    try do
+      (rep line) |> IO.puts
+    rescue
+      x -> IO.puts "runtime error"
+    end
     main
   end
 end

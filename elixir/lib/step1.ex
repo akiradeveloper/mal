@@ -9,7 +9,7 @@ defmodule MAL.Step1 do
   do: ast
 
   def print(exp),
-  do: MAL.Printer.pr_str(exp)
+  do: MAL.Printer.pr_str(exp, true)
 
   def rep(line),
   do: (read line) |> eval("") |> print
@@ -17,7 +17,11 @@ defmodule MAL.Step1 do
   def main do
     line = IO.gets "user> "
     # requires newline
-    (rep line) |> IO.puts
+    try do
+      (rep line) |> IO.puts
+    rescue
+      x -> IO.puts "runtime error"
+    end
     main
   end
 end
