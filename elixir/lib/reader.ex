@@ -12,6 +12,10 @@ defmodule MAL.Reader do
     s |> tokenizer |> parse_form |> elem(0)
   end
 
+  def into_map(xs) do
+    xs |> Enum.chunk(2) |> Enum.map(fn [a,b] -> {a,b} end)
+  end
+
   @spec parse_form([String.t]) :: {MAL.Types.t, [String.t]}
   def parse_form(toks) do
     case toks do
@@ -21,11 +25,14 @@ defmodule MAL.Reader do
       ["~@" | _] -> parse_quote("splice-unquote", tl(toks))
       ["@" | _] -> parse_quote("deref", tl(toks))
       ["(" | _] ->
-        {ast, rest} = parse_list([], tl(toks), ")")
-        {mal_list(value: Enum.reverse(ast)), rest}
+        {xs, rest} = parse_list([], tl(toks), ")")
+        {mal_list(value: Enum.reverse(xs)), rest}
       ["[" | _] ->
-        {ast, rest} = parse_list([], tl(toks), "]")
-        {mal_vector(value: Enum.reverse(ast)), rest}
+        {xs, rest} = parse_list([], tl(toks), "]")
+        {mal_vector(value: Enum.reverse(xs)), rest}
+      ["{" | _] ->
+        {xs, rest} = parse_list([], tl(toks), "}")
+        {mal_map(value: Enum.reverse(xs) |> into_map), rest}
       [_ | _] -> parse_atom(toks)
     end
   end

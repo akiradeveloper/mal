@@ -3,6 +3,7 @@ defmodule MAL.Types do
   require Record
   Record.defrecord :mal_list, value: nil, meta: :mal_nil
   Record.defrecord :mal_vector, value: nil, meta: :mal_nil
+  Record.defrecord :mal_map, value: nil, meta: :mal_nil
   Record.defrecord :mal_int, value: nil
   Record.defrecord :mal_bool, value: nil
   Record.defrecord :mal_kw, value: nil
@@ -17,6 +18,7 @@ defmodule MAL.Types do
     | mal_bool
     | mal_list
     | mal_vector
+    | mal_map
     | mal_string
     | mal_symbol
     | mal_func
@@ -29,6 +31,7 @@ defmodule MAL.Types do
   @type mal_bool :: record(:mal_bool, value: boolean)
   @type mal_list :: record(:mal_list, value: [t], meta: t)
   @type mal_vector :: record(:mal_vector, value: [t], meta: t)
+  @type mal_map :: record(:mal_map, value: [{t, t}], meta: t)
   @type mal_func :: record(:mal_func, value: func, is_macro: boolean, meta: t)
   @typep func :: ([t] -> t)
 

@@ -14,6 +14,9 @@ defmodule MAL.Printer do
       mal_vector(value: xs) ->
         l = xs |> Enum.map(&(pr_str(&1, pr))) |> Enum.join(" ")
         "[" <> l <> "]"
+      mal_map(value: dict) ->
+        l = dict |> Enum.map(fn {k, v} -> pr_str(k, pr)  <> " " <> pr_str(v, pr) end) |> Enum.join(" ")
+        "{" <> l <> "}"
       mal_int(value: val) -> to_string(val)
       mal_symbol(value: val) -> val
       mal_kw(value: val) -> ":#{val}"
