@@ -30,9 +30,9 @@ defmodule MAL.Printer do
             to_char_list |>
             Enum.map(fn chr ->
                   case chr do
-                    '\n' -> "\\n"
-                    '\\' -> "\\\\"
-                    '"' -> "\\\""
+                    10 -> "\\n" # \n
+                    92 -> "\\\\" # \\
+                    34 -> "\\\"" # "
                     c -> to_string([c])
                   end
                 end)
