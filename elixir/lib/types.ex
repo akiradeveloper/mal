@@ -1,5 +1,10 @@
 defmodule MAL.Types do
 
+  def debug(s) do
+    # s |> IO.inspect
+    s
+  end
+
   require Record
   Record.defrecord :mal_list, value: nil, meta: :mal_nil
   Record.defrecord :mal_vector, value: nil, meta: :mal_nil

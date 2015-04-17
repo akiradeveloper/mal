@@ -9,7 +9,7 @@ defmodule MAL.Reader do
 
   @spec read_str(String.t) :: MAL.Types.t
   def read_str(s) do
-    s |> tokenizer |> parse_form |> elem(0)
+    s |> tokenizer |> debug |> parse_form |> elem(0)
   end
 
   def into_map(xs) do
@@ -53,6 +53,10 @@ defmodule MAL.Reader do
     end
   end
 
+  def unescape(s) do
+    s |> String.replace("\\\"", "\"")
+  end
+
   @spec parse_atom([String.t]) :: {MAL.Types.t, [String.t]}
   def parse_atom(toks) do
     [tok | rest] = toks
@@ -64,7 +68,8 @@ defmodule MAL.Reader do
         "false" -> mal_bool(value: false)
         _ -> case hd(to_char_list(tok)) do
           58 -> mal_kw(value: to_char_list(tok) |> tl |> to_string) # : = 58
-          34 -> mal_string(value: tok |> String.strip(?\")) # " = 34
+          # strip \" only once
+          34 -> tok |> String.slice(1..-2) |> unescape |> (fn s -> mal_string(value: s) end).() # " = 34
           _ -> mal_symbol(value: tok)
         end
       end

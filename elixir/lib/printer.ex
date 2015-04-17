@@ -1,12 +1,9 @@
 defmodule MAL.Printer do
   import MAL.Types
 
-  def unescape(chr) do
-  end
-
   @spec pr_str(MAL.Types.t) :: String.t
   def pr_str(ast, pr \\ false) do
-    case ast do
+    case ast |> debug do
       mal_func(value: _) -> "#<function>"
       mal_list(value: xs) ->
         l = xs |> Enum.map(&(pr_str(&1, pr))) |> Enum.join(" ")
@@ -26,17 +23,17 @@ defmodule MAL.Printer do
       mal_string(value: val) ->
         case pr do
           true -> "\"#{
-            val |>
-            to_char_list |>
+            val |> debug |>
+            to_char_list |> debug |>
             Enum.map(fn chr ->
-                  case chr do
-                    10 -> "\\n" # \n
-                    92 -> "\\\\" # \\
-                    34 -> "\\\"" # "
-                    c -> to_string([c])
+                  case chr |> debug do
+                    10 -> '\\n'  # \n
+                    92 -> '\\\\' # \\
+                    34 -> '\\\"' # \"
+                    c -> c
                   end
                 end)
-            |> to_string
+            |> debug |> to_string
           }\""
           false -> val
         end
