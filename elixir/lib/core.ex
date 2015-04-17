@@ -118,7 +118,7 @@ defmodule MAL.Core do
         end,
       "println" =>
         fn xs ->
-          xs |> Enum.map(fn x -> MAL.Printer.pr_str(x, false) end) |> Enum.join("") |> IO.puts
+          xs |> Enum.map(fn x -> MAL.Printer.pr_str(x, false) end) |> Enum.join(" ") |> IO.puts
           :mal_nil
         end,
       "read-string" =>
